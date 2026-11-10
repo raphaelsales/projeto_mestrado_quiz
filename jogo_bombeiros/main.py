@@ -2,7 +2,7 @@
 main.py — Quiz Educacional: Normas Técnicas do Corpo de Bombeiros
 Desenvolvido com Python 3.12 + CustomTkinter + SQLite
 
-Projeto de Mestrado — PPGECA / UFT
+Projeto de Mestrado — PPGECA / IFTO
 """
 
 import customtkinter as ctk
@@ -117,8 +117,8 @@ class App(ctk.CTk):
     def __init__(self):
         super().__init__()
 
-        self.title("Quiz Normas — Corpo de Bombeiros  |  PPGECA · UFT")
-        self.geometry("980x700")
+        self.title("Quiz Normas — Corpo de Bombeiros  |  PPGECA · IFTO")
+        self.geometry("1920x1080")
         self.minsize(840, 620)
 
         _carregar_icones()
@@ -186,7 +186,7 @@ class TelaHome(ctk.CTkFrame):
 
         ctk.CTkLabel(
             centro,
-            text="Corpo de Bombeiros — PPGECA · UFT",
+            text="Corpo de Bombeiros — PPGECA · IFTO",
             font=ctk.CTkFont("Segoe UI", 14),
             text_color="#AAB7B8",
         ).pack(pady=(2, 30))
@@ -234,7 +234,7 @@ class TelaHome(ctk.CTkFrame):
             font=ctk.CTkFont("Segoe UI", 13),
             height=38,
             width=320,
-            corner_radius=10,
+            corner_radius=38,
             fg_color="transparent",
             border_width=1,
             border_color="#5D6D7E",
@@ -246,7 +246,7 @@ class TelaHome(ctk.CTkFrame):
         # Rodapé
         ctk.CTkLabel(
             self,
-            text="Pesquisa de Mestrado · PPGECA / UFT  ·  2025",
+            text="Pesquisa de Mestrado · PPGECA / IFTO  ·  2025",
             font=ctk.CTkFont("Segoe UI", 11),
             text_color="#4D5656",
         ).pack(side="bottom", pady=12)
@@ -311,22 +311,9 @@ class TelaModulos(ctk.CTkFrame):
         cfg.pack_propagate(False)
 
         ctk.CTkLabel(
-            cfg, text="Dificuldade:",
-            font=ctk.CTkFont("Segoe UI", 13), text_color="#BDC3C7"
-        ).place(x=20, rely=0.5, anchor="w")
-
-        ctk.CTkOptionMenu(
-            cfg, variable=self.app.dific_sel,
-            values=DIFIC_LABEL,
-            font=ctk.CTkFont("Segoe UI", 13),
-            fg_color="#2C2C2C", button_color="#C0392B",
-            button_hover_color="#A93226", width=180,
-        ).place(x=120, rely=0.5, anchor="w")
-
-        ctk.CTkLabel(
             cfg, text="Questões por sessão:",
             font=ctk.CTkFont("Segoe UI", 13), text_color="#BDC3C7"
-        ).place(x=320, rely=0.5, anchor="w")
+        ).place(x=20, rely=0.5, anchor="w")
 
         self._qtd_var = ctk.StringVar(value="10")
         ctk.CTkOptionMenu(
@@ -335,7 +322,7 @@ class TelaModulos(ctk.CTkFrame):
             font=ctk.CTkFont("Segoe UI", 13),
             fg_color="#2C2C2C", button_color="#C0392B",
             button_hover_color="#A93226", width=80,
-        ).place(x=460, rely=0.5, anchor="w")
+        ).place(x=170, rely=0.5, anchor="w")
 
         # Grid de módulos
         self._scroll = ctk.CTkScrollableFrame(self, fg_color="transparent")
@@ -438,23 +425,20 @@ class TelaModulos(ctk.CTkFrame):
     def _iniciar_quiz(self):
         if not self._sel_modulo:
             return
-        dific = DIFIC_VALOR[self.app.dific_sel.get()]
         qtd = int(self._qtd_var.get())
-        questoes = self.app.db.get_questoes(self._sel_modulo, dific, qtd)
+        questoes = self.app.db.get_questoes(self._sel_modulo, "todos", qtd)
 
         if not questoes:
             messagebox.showinfo(
                 "Sem questões",
-                f"Nenhuma questão encontrada para o módulo '{self._sel_modulo}' "
-                f"com dificuldade '{self.app.dific_sel.get()}'.\n\n"
-                "Tente selecionar 'Todos' na dificuldade."
+                f"Nenhuma questão encontrada para o módulo '{self._sel_modulo}'."
             )
             return
 
         self.app.session_id = self.app.db.criar_sessao(
             self.app.player_name.get(),
             self._sel_modulo,
-            dific,
+            "todos",
         )
         self.app.mostrar("TelaQuiz", questoes=questoes, modulo=self._sel_modulo)
 
@@ -1002,7 +986,7 @@ class TelaHistorico(ctk.CTkFrame):
         # Cabeçalho
         cab = ctk.CTkFrame(tab, fg_color="#1A1A1A", corner_radius=6)
         cab.pack(fill="x", padx=4, pady=(0, 2))
-        for txt, w in [("Módulo", 200), ("Dificul.", 100), ("Acertos", 90),
+        for txt, w in [("Módulo", 200), ("Acertos", 90),
                        ("Pontos", 90), ("T.Médio", 80), ("Data", 140)]:
             ctk.CTkLabel(
                 cab, text=txt, width=w,
@@ -1097,7 +1081,6 @@ class TelaHistorico(ctk.CTkFrame):
 
             for txt, w in [
                 (s["modulo"][:25], 200),
-                (s["dificuldade"].capitalize()[:12], 100),
                 (f"{s['acertos']}/{total} ({pct_val:.0f}%)", 90),
                 (str(s["pontuacao"]), 90),
                 (f"{t_medio:.1f}s", 80),
